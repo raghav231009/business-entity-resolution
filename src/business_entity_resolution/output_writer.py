@@ -7,7 +7,7 @@ Produces the two required output files in exact challenge format.
 from __future__ import annotations
 
 import logging
-from typing import Dict, Set
+from typing import Dict, List, Set
 
 import pandas as pd
 

@@ -13,18 +13,15 @@ Covers:
 """
 
 import json
-from pathlib import Path
 import pytest
 import pandas as pd
-import numpy as np
 
-from business_entity_resolution.config import Config, BlockingConfig, FeaturesConfig
-from business_entity_resolution.data_loader import SourceData
+from business_entity_resolution.config import Config, FeaturesConfig
 from business_entity_resolution.evaluate import entity_level_f05, evaluate_from_predictions
 from business_entity_resolution.threshold_tuning import tune_threshold
-from business_entity_resolution.postprocessing import resolve_threshold, postprocess
+from business_entity_resolution.postprocessing import resolve_threshold
 from business_entity_resolution.candidate_generation import generate_candidates, _report_candidate_recall
-from business_entity_resolution.feature_builder import TfidfBundle, build_feature_matrix
+from business_entity_resolution.feature_builder import TfidfBundle
 from business_entity_resolution.preprocessing import normalize_country
 from business_entity_resolution.validation import validate_outputs
 

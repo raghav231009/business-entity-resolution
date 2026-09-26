@@ -9,7 +9,7 @@ down-samples negatives.
 from __future__ import annotations
 
 import logging
-from typing import Dict, Set, Tuple
+from typing import Any, Dict, Set, Tuple
 
 import numpy as np
 import pandas as pd

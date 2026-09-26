@@ -9,12 +9,7 @@ Covers:
 5. End-to-end smoke test execution in isolated temporary paths.
 """
 
-import json
-import tempfile
-from pathlib import Path
-import pytest
-
-from business_entity_resolution.config import load_config, Config
+from business_entity_resolution.config import load_config
 from business_entity_resolution.reproducibility import (
     check_environment,
     compute_file_sha256,
