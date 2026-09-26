@@ -50,13 +50,13 @@ The complete official challenge dataset was processed:
 - **Target Membership**: All predicted candidate IDs strictly belong to the test Source-2/Source-3 union.
 
 ## 7. Reproducibility
-- **Timestamp (UTC)**: `2026-09-26T13:17:23.173266+00:00`
+- **Timestamp (UTC)**: `2026-09-26T13:20:19.431960+00:00`
 - **Source Code SHA-256**: `c6e3e0d53b8ebae9b329df77dcc2e27432baac26d331114cd46bb099af592552`
 - **Config YAML SHA-256**: `0a8407f650a696d73277fd87b347871945fa12d79a87c690c2acdf4d032537a0`
 - **Git Repository**: `https://github.com/raghav231009/business-entity-resolution.git`
 - **Git Branch**: `main`
-- **Git Commit**: `181c23f53cac12d028f09b59cf0b11614a815683`
-- **Working Tree State**: `DIRTY (19 uncommitted file changes)`
+- **Git Commit**: `a339bae63ab1c65bf2e7467244cabef432d1e103`
+- **Working Tree State**: `DIRTY (1 uncommitted file changes)`
 - **Python**: `3.13.4`
 - **Platform**: `Windows-11-10.0.26200-SP0`
 - **Key Packages**:
