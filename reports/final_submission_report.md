@@ -11,9 +11,9 @@ The complete official challenge dataset was processed:
 - **Test Source 3**: 482.56 MB (850942b11d2a4343...)
 
 ## 2. Training
-- **Execution Mode**: `final`
-- **Training S1 Entities Limit**: `None`
-- **Validation S1 Entities Limit**: `None`
+- **Execution Mode**: `dev`
+- **Training S1 Entities Limit**: `50000`
+- **Validation S1 Entities Limit**: `10000`
 - **Model Type**: `lightgbm`
 - **Saved Model File**: `entity_matcher.joblib` (SHA-256: `ab38ed238f3a83f6...`)
 - **Negative Sampling**: Configured max negatives per positive = 20, prioritizing hard negatives.
@@ -25,12 +25,12 @@ The complete official challenge dataset was processed:
   - `country + postal_code`
   - `name_token + postal_code`
   - `name_prefix + postal_code`
-- **Candidate Recall (Link-Level)**: **1.0** (≥ 97.6% true links covered)
+- **Candidate Recall (Link-Level)**: **0.5000** (50.00% true links covered)
 - **Candidate Safety Cap**: max 50 candidates per S1 entity with similarity pre-ranking.
 
 ## 4. Validation
 - **Evaluation Metric**: Exact Challenge Macro-averaged Entity-Level $F_{0.5}$ with exact singleton handling ($F_{0.5} = 1.0$ for true singletons predicted empty, $0.0$ for false positives).
-- **Tuned Threshold**: **0.9**
+- **Tuned Threshold**: **0.90**
 - **Validation Macro F0.5**: **0.9705**
 
 ## 5. Test Prediction
@@ -50,10 +50,13 @@ The complete official challenge dataset was processed:
 - **Target Membership**: All predicted candidate IDs strictly belong to the test Source-2/Source-3 union.
 
 ## 7. Reproducibility
-- **Timestamp (UTC)**: `2026-09-26T12:42:41.236427+00:00`
-- **Source Code SHA-256**: `f1621eaf12d9b2d22d7828d643ea61e139fe4b7cc636f4782ca5cb0587faa927`
+- **Timestamp (UTC)**: `2026-09-26T13:17:23.173266+00:00`
+- **Source Code SHA-256**: `c6e3e0d53b8ebae9b329df77dcc2e27432baac26d331114cd46bb099af592552`
 - **Config YAML SHA-256**: `0a8407f650a696d73277fd87b347871945fa12d79a87c690c2acdf4d032537a0`
-- **Git Commit**: `none (clean standalone export)`
+- **Git Repository**: `https://github.com/raghav231009/business-entity-resolution.git`
+- **Git Branch**: `main`
+- **Git Commit**: `181c23f53cac12d028f09b59cf0b11614a815683`
+- **Working Tree State**: `DIRTY (19 uncommitted file changes)`
 - **Python**: `3.13.4`
 - **Platform**: `Windows-11-10.0.26200-SP0`
 - **Key Packages**:

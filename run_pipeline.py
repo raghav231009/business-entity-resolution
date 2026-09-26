@@ -45,6 +45,7 @@ VALID_STAGES = (
     "verify",
     "env-check",
     "smoke-test",
+    "cap-experiment",
 )
 
 
@@ -66,6 +67,10 @@ def _run_stage(stage: str, cfg) -> None:
 
     if stage == "smoke-test":
         _stage_smoke_test(cfg)
+        return
+
+    if stage == "cap-experiment":
+        _stage_cap_experiment(cfg)
         return
 
     if stage in ("all", "eda"):
@@ -182,6 +187,14 @@ def _stage_verify(cfg) -> None:
     logging.getLogger(__name__).info("=" * 60)
     from business_entity_resolution.pipeline import run_verify
     run_verify(cfg)
+
+
+def _stage_cap_experiment(cfg) -> None:
+    logging.getLogger(__name__).info("=" * 60)
+    logging.getLogger(__name__).info("[EXP] Candidate Cap Tradeoff Experiment (K = 25, 50, 75, 100, 150)")
+    logging.getLogger(__name__).info("=" * 60)
+    from business_entity_resolution.candidate_cap_experiment import run_candidate_cap_experiment
+    run_candidate_cap_experiment(cfg)
 
 
 # ------------------------------------------------------------------ #

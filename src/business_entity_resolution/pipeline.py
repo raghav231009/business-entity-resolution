@@ -279,27 +279,40 @@ def run_train(cfg: "Config") -> None:
     # 3. Parse ground truth
     gt_map = parse_ground_truth(data.ground_truth) if data.ground_truth is not None else {}
 
-    # 4. Generate candidates (with ground truth for candidate recall measurement)
-    logger.info("[3/8] Generating candidates")
+    # 4. Split Source-1 entities at entity level BEFORE TF-IDF fitting & feature building
+    from .dataset_builder import split_s1_entities, prefilter_candidates_for_training, build_training_dataset
+    from .feature_builder import fit_tfidf_bundle, save_tfidf_bundle, build_feature_matrix
+
+    logger.info("[3/8] Splitting Source-1 entities for leak-free training")
+    train_s1_ids, val_s1_ids, val_gt_map = split_s1_entities(data.source1, gt_map, cfg)
+
+    # 5. Fit TF-IDF bundle strictly on training Source-1 entities and candidate pool
+    logger.info("[4/8] Fitting TF-IDF bundle on training corpus only")
+    s1_train = data.source1[data.source1["entity_id"].isin(train_s1_ids)].copy()
+    pool = pd.concat([data.source2, data.source3], ignore_index=True)
+    tfidf_bundle = fit_tfidf_bundle(s1_train, pool, cfg)
+    save_tfidf_bundle(tfidf_bundle, cfg.paths.models_dir / "tfidf_bundle.joblib")
+
+    # 6. Generate candidates (measuring candidate recall against held-out validation ground truth)
+    logger.info("[5/8] Generating candidates (evaluating recall on validation set)")
     candidates = generate_candidates(
         data.source1, data.source2, data.source3, cfg,
-        ground_truth_map=gt_map,
+        ground_truth_map=val_gt_map,
     )
 
     # Prefilter candidate pairs before expensive feature extraction (keeps 100% of positives)
-    from .dataset_builder import prefilter_candidates_for_training, build_training_dataset
     max_neg = getattr(cfg.training, "max_negatives_per_positive", 15)
     candidates = prefilter_candidates_for_training(
         candidates, gt_map, max_neg_per_s1=max_neg or 15, random_seed=cfg.random_seed
     )
 
-    # 5. Build features (fit TF-IDF vectorizers on training corpus only)
-    logger.info("[4/8] Building features (leak-free)")
-    feat_df = build_feature_matrix(candidates, data, cfg, fit_tfidf=True)
+    # 7. Build features using the fitted TF-IDF bundle via transform() only
+    logger.info("[6/8] Building features (leak-free transform)")
+    feat_df = build_feature_matrix(candidates, data, cfg, fit_tfidf=False, tfidf_bundle=tfidf_bundle, pool=pool)
 
-    # 6. Build labelled dataset
-    logger.info("[5/8] Building training dataset (Source-1 entity split)")
-    train_df, val_df, val_gt_map = build_training_dataset(feat_df, gt_map, cfg)
+    # 8. Build labelled dataset
+    logger.info("[7/8] Labeling training dataset (Source-1 entity split)")
+    train_df, val_df, _ = build_training_dataset(feat_df, gt_map, cfg)
 
     logger.info("==================================================")
     logger.info("MODEL")
@@ -308,8 +321,8 @@ def run_train(cfg: "Config") -> None:
     logger.info("Positive pairs: %d", int(train_df["label"].sum()))
     logger.info("Negative pairs: %d", int((train_df["label"] == 0).sum()))
 
-    # 7. Train model & save full validation ground truth
-    logger.info("[6/8] Training model")
+    # 9. Train model & save full validation ground truth
+    logger.info("[8/8] Training model")
     train_model(train_df, val_df, cfg, val_gt_map=val_gt_map)
 
     logger.info("Training stage finished.")

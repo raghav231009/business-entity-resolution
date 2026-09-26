@@ -345,19 +345,31 @@ def _report_candidate_recall(
         if overlap_count > 0:
             s1_any_covered += 1
 
+    zero_cand_entities = sum(1 for s1_id in gt_map if len(cand_sets.get(s1_id, set())) == 0)
     missed = total_true - found
-    recall = found / total_true if total_true > 0 else 1.0
-    pct_all = (s1_all_covered / s1_with_truth * 100.0) if s1_with_truth > 0 else 100.0
-    pct_any = (s1_any_covered / s1_with_truth * 100.0) if s1_with_truth > 0 else 100.0
+
+    if total_true == 0:
+        recall = None
+        pct_all = None
+        pct_any = None
+    else:
+        recall = found / total_true
+        pct_all = (s1_all_covered / s1_with_truth * 100.0) if s1_with_truth > 0 else 0.0
+        pct_any = (s1_any_covered / s1_with_truth * 100.0) if s1_with_truth > 0 else 0.0
 
     logger.info("==================================================")
     logger.info("BLOCKING RECALL EVALUATION")
     logger.info("==================================================")
-    logger.info("  Candidate recall (link level) : %.4f  (%d / %d true links covered)", recall, found, total_true)
+    if recall is not None:
+        logger.info("  Candidate recall (link level) : %.4f  (%d / %d true links covered)", recall, found, total_true)
+        logger.info("  Entities with ALL matches covered: %d (%.2f%%)", s1_all_covered, pct_all)
+        logger.info("  Entities with ANY matches covered: %d (%.2f%%)", s1_any_covered, pct_any)
+    else:
+        logger.info("  Candidate recall (link level) : NOT_AVAILABLE (zero known true links in evaluated population)")
+        logger.info("  Candidate recall not measured because the evaluation population contained zero known true links.")
     logger.info("  Total true links missed       : %d", missed)
-    logger.info("  S1 entities with ≥1 true match: %d", s1_with_truth)
-    logger.info("  Entities with ALL matches covered: %d (%.2f%%)", s1_all_covered, pct_all)
-    logger.info("  Entities with ANY matches covered: %d (%.2f%%)", s1_any_covered, pct_any)
+    logger.info("  S1 entities with >=1 true match: %d", s1_with_truth)
+    logger.info("  S1 entities with 0 candidates : %d", zero_cand_entities)
     logger.info("  Candidates before cap         : %d", total_before_cap)
     logger.info("  Candidates after cap          : %d", total_after_cap)
     logger.info("  True matches lost due to cap  : %d", total_lost_to_cap)
@@ -365,6 +377,7 @@ def _report_candidate_recall(
 
     metrics = {
         "candidate_recall": recall,
+        "candidate_recall_status": "MEASURED" if total_true > 0 else "NOT_AVAILABLE",
         "total_true_links": total_true,
         "true_links_covered": found,
         "true_links_missed": missed,
@@ -373,9 +386,15 @@ def _report_candidate_recall(
         "entities_all_covered_pct": pct_all,
         "entities_any_covered_count": s1_any_covered,
         "entities_any_covered_pct": pct_any,
+        "entities_zero_candidates": zero_cand_entities,
         "candidates_before_cap": total_before_cap,
         "candidates_after_cap": total_after_cap,
         "true_matches_lost_to_cap": total_lost_to_cap,
+        "message": (
+            f"Candidate recall: {recall:.4f}"
+            if recall is not None
+            else "Candidate recall not measured because the evaluation population contained zero known true links."
+        ),
     }
 
     # Save to metrics dir

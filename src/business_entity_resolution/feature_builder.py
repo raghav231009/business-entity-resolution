@@ -62,12 +62,15 @@ class TfidfBundle:
 
     def __init__(self, fcfg: FeaturesConfig):
         self.fcfg = fcfg
+        self.feature_version = "2.0.0"
+        self.is_fitted = False
+        self.fit_stats: Dict[str, Any] = {}
         self.name_word_vec: Optional[TfidfVectorizer] = None
         self.name_char_vec: Optional[TfidfVectorizer] = None
         self.addr_word_vec: Optional[TfidfVectorizer] = None
         self.addr_char_vec: Optional[TfidfVectorizer] = None
 
-    def fit(self, name_corpus: pd.Series, addr_corpus: pd.Series) -> None:
+    def fit(self, name_corpus: pd.Series, addr_corpus: pd.Series, corpus_stats: Optional[Dict[str, Any]] = None) -> None:
         """Fit vectorizers on training corpus only."""
         if self.fcfg.name_tfidf_cosine:
             self.name_word_vec = TfidfVectorizer(
@@ -100,6 +103,9 @@ class TfidfBundle:
                 sublinear_tf=True,
             ).fit(addr_corpus.fillna(""))
             logger.info("Fitted TF-IDF address vectorizers (word & char_wb).")
+
+        self.is_fitted = True
+        self.fit_stats = corpus_stats or {}
 
     def compute_cosine(
         self,
@@ -159,6 +165,62 @@ class TfidfBundle:
                 out[b_idx] = sims
 
         return np.clip(out, 0.0, 1.0)
+
+
+# ================================================================== #
+#  Standalone TF-IDF bundle helpers
+# ================================================================== #
+
+def fit_tfidf_bundle(
+    s1_train: pd.DataFrame,
+    pool: pd.DataFrame,
+    cfg: Config,
+) -> TfidfBundle:
+    """
+    Fit TF-IDF bundle strictly on training Source-1 entities and candidate pool.
+    Validation entities are NEVER passed to or seen by this function.
+    """
+    fcfg = cfg.features
+    bundle = TfidfBundle(fcfg)
+
+    s1_name = s1_train["business_name_normalized"] if "business_name_normalized" in s1_train.columns else s1_train.get("business_name", "")
+    s1_addr = s1_train["business_address_normalized"] if "business_address_normalized" in s1_train.columns else s1_train.get("business_address", "")
+    pool_name = pool["business_name_normalized"] if "business_name_normalized" in pool.columns else pool.get("business_name", "")
+    pool_addr = pool["business_address_normalized"] if "business_address_normalized" in pool.columns else pool.get("business_address", "")
+
+    name_train = pd.concat([s1_name, pool_name]).fillna("")
+    addr_train = pd.concat([s1_addr, pool_addr]).fillna("")
+
+    max_corpus = 500000
+    if len(name_train) > max_corpus:
+        sample_idx = name_train.sample(n=max_corpus, random_state=cfg.random_seed).index
+        name_train = name_train.loc[sample_idx]
+        addr_train = addr_train.loc[sample_idx]
+
+    stats = {
+        "s1_train_records": len(s1_train),
+        "pool_records": len(pool),
+        "fitted_corpus_records": len(name_train),
+    }
+    bundle.fit(name_train, addr_train, corpus_stats=stats)
+    return bundle
+
+
+def save_tfidf_bundle(bundle: TfidfBundle, path: Path) -> None:
+    """Persist fitted TF-IDF bundle to disk."""
+    import joblib
+    path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(bundle, path)
+    logger.info("Saved fitted TF-IDF bundle to %s", path)
+
+
+def load_tfidf_bundle(path: Path) -> TfidfBundle:
+    """Load fitted TF-IDF bundle from disk."""
+    import joblib
+    if not path.exists():
+        raise FileNotFoundError(f"TF-IDF bundle not found at {path}")
+    bundle = joblib.load(path)
+    return bundle
 
 
 # ================================================================== #

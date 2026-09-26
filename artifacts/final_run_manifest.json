@@ -1,9 +1,33 @@
 {
   "manifest_version": "1.0.0",
-  "timestamp_utc": "2026-09-26T12:42:41.236427+00:00",
-  "execution_mode": "final",
-  "git_commit": "none (clean standalone export)",
-  "source_code_sha256": "f1621eaf12d9b2d22d7828d643ea61e139fe4b7cc636f4782ca5cb0587faa927",
+  "timestamp_utc": "2026-09-26T13:17:23.173266+00:00",
+  "execution_mode": "dev",
+  "git_commit": "181c23f53cac12d028f09b59cf0b11614a815683",
+  "git_repo_url": "https://github.com/raghav231009/business-entity-resolution.git",
+  "git_branch": "main",
+  "working_tree_clean": false,
+  "modified_files": [
+    "M README.md",
+    "M artifacts/metrics/candidate_recall.json",
+    "M models/tfidf_bundle.joblib",
+    "M requirements.txt",
+    "M run_pipeline.py",
+    "M src/business_entity_resolution/candidate_generation.py",
+    "M src/business_entity_resolution/dataset_builder.py",
+    "M src/business_entity_resolution/feature_builder.py",
+    "M src/business_entity_resolution/output_writer.py",
+    "M src/business_entity_resolution/pipeline.py",
+    "M src/business_entity_resolution/reproducibility.py",
+    "M src/business_entity_resolution/validation.py",
+    "M tests/test_hardening.py",
+    "?? artifacts/metrics/candidate_cap_experiment.json",
+    "?? candidate_recall.json",
+    "?? eval_t0.50.json",
+    "?? final_submission_report.md",
+    "?? reports/candidate_cap_experiment.md",
+    "?? src/business_entity_resolution/candidate_cap_experiment.py"
+  ],
+  "source_code_sha256": "c6e3e0d53b8ebae9b329df77dcc2e27432baac26d331114cd46bb099af592552",
   "config_file_sha256": "0a8407f650a696d73277fd87b347871945fa12d79a87c690c2acdf4d032537a0",
   "environment": {
     "python_version": "3.13.4 (tags/v3.13.4:8a526ec, Jun  3 2025, 17:46:04) [MSC v.1943 64 bit (AMD64)]",
@@ -77,8 +101,9 @@
     "candidate_pairs_tsv": "dd61c601b630c3769fc2d30da17cb7aeea8d8c96dcf0d2342b31870cfd480156"
   },
   "pipeline_metrics": {
-    "max_train_s1_entities": null,
-    "max_validation_s1_entities": null,
-    "candidate_recall": 1.0
+    "max_train_s1_entities": 50000,
+    "max_validation_s1_entities": 10000,
+    "candidate_recall": 0.5,
+    "validation_macro_f05": 0.9704740612587982
   }
 }

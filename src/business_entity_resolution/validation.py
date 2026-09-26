@@ -180,8 +180,8 @@ def validate_outputs(cfg: Config) -> bool:
 
     # ---- Summary ---------------------------------------------------
     if ok:
-        logger.info("✅  All output validation checks passed successfully.")
+        logger.info("[OK] All output validation checks passed successfully.")
     else:
-        logger.error("❌  Validation failed — see errors above.")
+        logger.error("[FAIL] Validation failed - see errors above.")
 
     return ok

@@ -234,18 +234,53 @@ Informative single-channel and compound strategies whose union produces the cand
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Running Tests & Quality Verification
+
+Run the comprehensive unit, regression, and pipeline test suite:
 
 ```bash
-pip install pytest
-python -m pytest tests/ -v
+# Verify environment and pinned dependencies
+python run_pipeline.py --stage env-check
+
+# Run all 68+ unit, hardening, and regression tests
+python -m pytest tests/ -q
 ```
+
+The test suite validates:
+- Exact challenge macro $F_{0.5}$ metric computation and singleton scoring
+- Full ground truth evaluation (unretrieved true matches remain penalized)
+- Candidate recall calculation and explicit `NOT_AVAILABLE` state when zero true links exist
+- Candidate cap tradeoff logic and deterministic similarity ranking (no arbitrary ID truncation)
+- Leak-free TF-IDF fitting on training split only and transform-only on validation/test
+- Submission format, exact column headers, TSV tab delimiters, and subset consistency ($\text{matches} \subseteq \text{candidates}$)
+- Reproducibility manifest generation, git commit provenance, and working-tree dirty detection
 
 ---
 
-## 📈 Experiment Tracking
+## 🔬 Core Methodology & Hardening Details
 
-Every experiment saves metrics as JSON in `artifacts/metrics/`. Compare runs by changing `config.yaml` settings (blocking strategies, features, model params, thresholds).
+### 1. Leak-Free TF-IDF Pipeline
+Unlike naive implementations that fit vectorizers across the entire dataset, this pipeline strictly splits Source-1 entities first:
+`FULL TRAIN DATA -> SOURCE-1 SPLIT -> TRAIN (fit TF-IDF) -> transform TRAIN / transform VALIDATION`.
+Test inference loads the persisted TF-IDF bundle (`models/tfidf_bundle.joblib`) and applies `transform()` only.
+
+### 2. Candidacy & Justified Candidate Cap
+- **Multi-channel Blocking**: Evaluates 12+ compound and token blocking keys across normalized fields.
+- **Empirical Cap Selection**: Evaluated $K \in [25, 50, 75, 100, 150]$ (`reports/candidate_cap_experiment.md`). $K=50$ captures $85.99\%$ candidate recall with optimal pair density and fast runtime ($0.27$s), while $K=75$ only adds $+0.55\%$ recall at $+43\%$ pair cost.
+- **Informative Pre-ranking**: Candidates exceeding $K$ are sorted by composite similarity (token Jaccard, fuzzy ratio, postal match), never alphabetical/ID truncation.
+- **Honest Candidate Recall**: Computed strictly on held-out validation sets with known ground truth. If evaluated on zero true links, reports `NOT_AVAILABLE` with explicit diagnostics rather than vacuous `1.0`.
+
+### 3. Evaluation & Threshold Optimization
+- **Full Ground Truth**: Evaluated against the complete validation ground truth (`models/val_ground_truth.json`). Candidates missed by blocking are never dropped from truth.
+- **Macro-averaged Entity-Level $F_{0.5}$**: Weights precision over recall ($\beta=0.5$). Singletons predicted empty receive $1.0$; false positive matches on singletons receive $0.0$.
+- **Tuned Decision Boundary**: Automatically sweeps thresholds to optimize macro $F_{0.5}$ and persists to `models/selected_threshold.json`.
+
+### 4. Git Provenance & Reproducibility Manifest
+`artifacts/final_run_manifest.json` records:
+- Git repository URL, commit hash, branch, and working-tree clean/dirty status
+- SHA-256 hashes of config YAML, source code tree, model weights, dataset files, and output TSVs
+- Pinned dependency versions (`requirements.txt`)
+- Execution mode (`dev` vs `final`) and timestamps
 
 ---
 

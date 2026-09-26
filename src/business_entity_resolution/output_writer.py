@@ -98,7 +98,7 @@ def write_outputs(
     if violations > 0:
         logger.error("%d S1 entities have matched IDs outside their candidate set!", violations)
     else:
-        logger.info("Consistency check passed: all matched IDs ⊆ candidate IDs.")
+        logger.info("Consistency check passed: all matched IDs <= candidate IDs.")
 
 
 def append_chunk_outputs(

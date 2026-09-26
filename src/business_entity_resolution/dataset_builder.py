@@ -38,6 +38,49 @@ def _is_hard_negative(df: pd.DataFrame) -> pd.Series:
     return cond
 
 
+def split_s1_entities(
+    s1_entities: Any,
+    gt_map: Dict[str, Set[str]],
+    cfg: Config,
+) -> Tuple[Set[str], Set[str], Dict[str, Set[str]]]:
+    """
+    Split Source-1 entities into training and validation sets at entity level.
+
+    Parameters
+    ----------
+    s1_entities : DataFrame, list, or set of entity IDs.
+    gt_map : dict
+        Full ground-truth mapping.
+    cfg : Config
+
+    Returns
+    -------
+    (train_s1, val_s1, val_gt_map)
+    """
+    rng = np.random.RandomState(cfg.random_seed)
+    if isinstance(s1_entities, pd.DataFrame):
+        all_s1_universe = sorted(s1_entities["entity_id"].unique())
+    elif isinstance(s1_entities, (set, list)):
+        all_s1_universe = sorted(s1_entities)
+    else:
+        all_s1_universe = sorted(gt_map.keys())
+
+    rng.shuffle(all_s1_universe)
+
+    val_size = int(len(all_s1_universe) * cfg.training.validation_split)
+    max_val_s1 = getattr(cfg.training, "max_validation_s1_entities", None)
+    if max_val_s1 is not None and val_size > max_val_s1:
+        logger.info("Dev mode: Bounding validation S1 entities to %d (out of %d)", max_val_s1, val_size)
+        val_size = max_val_s1
+
+    val_s1 = set(all_s1_universe[:val_size])
+    train_s1 = set(all_s1_universe[val_size:])
+
+    val_gt_map: Dict[str, Set[str]] = {s1: set(gt_map.get(s1, set())) for s1 in val_s1}
+    logger.info("Split Source-1 universe: %d train entities, %d val entities", len(train_s1), len(val_s1))
+    return train_s1, val_s1, val_gt_map
+
+
 def build_training_dataset(
     feat_df: pd.DataFrame,
     gt_map: Dict[str, Set[str]],

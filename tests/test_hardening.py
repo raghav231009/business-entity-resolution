@@ -136,3 +136,116 @@ class TestSmokeTestStage:
         cfg = load_config(mode="dev")
         result = run_smoke_test(cfg)
         assert result is True
+
+
+# ================================================================== #
+#  5. Candidate Recall Zero Ground Truth Handling
+# ================================================================== #
+
+class TestCandidateRecallHardening:
+    def test_zero_true_links_returns_none_not_one(self):
+        """Candidate recall must return None when total_true_links == 0, never 1.0."""
+        import pandas as pd
+        from business_entity_resolution.candidate_generation import _report_candidate_recall
+
+        cfg = load_config(mode="dev")
+        cand_df = pd.DataFrame([
+            {"source1_id": "S1-A", "candidate_id": "S2-1"},
+            {"source1_id": "S1-B", "candidate_id": "S2-2"},
+        ])
+        # Ground truth has zero true matches (all singletons)
+        gt_map = {"S1-A": set(), "S1-B": set()}
+
+        metrics = _report_candidate_recall(cand_df, gt_map, cfg)
+        assert metrics["total_true_links"] == 0
+        assert metrics["candidate_recall"] is None
+        assert metrics["candidate_recall_status"] == "NOT_AVAILABLE"
+        assert "Candidate recall not measured" in metrics["message"]
+
+    def test_positive_true_links_computes_exact_recall(self):
+        """Candidate recall with real links returns exact ratio."""
+        import pandas as pd
+        from business_entity_resolution.candidate_generation import _report_candidate_recall
+
+        cfg = load_config(mode="dev")
+        cand_df = pd.DataFrame([
+            {"source1_id": "S1-A", "candidate_id": "S2-1"},
+            {"source1_id": "S1-B", "candidate_id": "S2-2"},
+        ])
+        # S1-A true is S2-1, S1-B true is S2-9 (missed)
+        gt_map = {"S1-A": {"S2-1"}, "S1-B": {"S2-9"}}
+
+        metrics = _report_candidate_recall(cand_df, gt_map, cfg)
+        assert metrics["total_true_links"] == 2
+        assert metrics["true_links_covered"] == 1
+        assert metrics["true_links_missed"] == 1
+        assert metrics["candidate_recall"] == 0.5
+        assert metrics["candidate_recall_status"] == "MEASURED"
+
+
+# ================================================================== #
+#  6. TF-IDF Leak-Free Fitting & Transform
+# ================================================================== #
+
+class TestTfidfLeakFree:
+    def test_bundle_is_fitted_flag(self):
+        """TfidfBundle sets is_fitted=True on fit and uses transform on data."""
+        import pandas as pd
+        from business_entity_resolution.feature_builder import TfidfBundle
+
+        cfg = load_config(mode="dev")
+        bundle = TfidfBundle(cfg.features)
+        assert bundle.is_fitted is False
+
+        corpus_names = pd.Series(["Amazon Inc", "Google LLC", "Microsoft Corp"])
+        corpus_addrs = pd.Series(["410 Terry Ave", "1600 Amphitheatre Pkwy", "One Microsoft Way"])
+        bundle.fit(corpus_names, corpus_addrs)
+        assert bundle.is_fitted is True
+
+        # Calling compute_cosine does not alter vectorizer vocabulary (strictly transform)
+        vocab_size_before = len(bundle.name_word_vec.vocabulary_)
+        cand_s1 = ["S1-1"]
+        cand_pool = ["S2-1"]
+        s1_names = pd.Series(["Apple Inc"], index=["S1-1"])
+        pool_names = pd.Series(["Apple Computer"], index=["S2-1"])
+        sims = bundle.compute_cosine(
+            s1_names, pool_names,
+            pd.Series(["S1-1"]), pd.Series(["S2-1"]),
+            cand_s1, cand_pool,
+            vec_type="name_word",
+        )
+        assert len(sims) == 1
+        assert len(bundle.name_word_vec.vocabulary_) == vocab_size_before
+
+
+# ================================================================== #
+#  7. Report Generation No Fallbacks
+# ================================================================== #
+
+class TestReportHardening:
+    def test_no_hardcoded_metric_fallbacks_in_markdown(self, tmp_path):
+        """Report must show NOT_AVAILABLE / NOT_MEASURED instead of 0.9766 / 0.9705 when metrics missing."""
+        from business_entity_resolution.reproducibility import generate_final_submission_report
+
+        cfg = load_config(mode="dev")
+        # Manifest with missing/null metrics
+        manifest = {
+            "execution_mode": "dev",
+            "dataset_files": {},
+            "environment": {"package_versions": {}},
+            "model": {"model_type": "lightgbm", "model_file": "entity_matcher.joblib", "model_sha256": "abc"},
+            "output_files": {},
+            "pipeline_metrics": {
+                "max_train_s1_entities": 50000,
+                "max_validation_s1_entities": 10000,
+                "candidate_recall": None,
+                "validation_macro_f05": None,
+            },
+        }
+        report_path = tmp_path / "report.md"
+        report_text = generate_final_submission_report(manifest, cfg, report_path)
+
+        assert "0.9766" not in report_text
+        assert "0.9705" not in report_text
+        assert "NOT_AVAILABLE" in report_text
+        assert "NOT_MEASURED" in report_text

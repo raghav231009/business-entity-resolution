@@ -76,8 +76,15 @@ def compute_code_hash(project_root: Path) -> str:
     return h.hexdigest()
 
 
-def get_git_commit(project_root: Path) -> str:
-    """Return current git commit hash if git repository is present, else 'none'."""
+def get_git_info(project_root: Path) -> Dict[str, Any]:
+    """Return comprehensive git metadata: commit, remote URL, branch, clean status, modified files."""
+    info: Dict[str, Any] = {
+        "git_commit": "none (standalone export)",
+        "git_repo_url": "none",
+        "git_branch": "none",
+        "working_tree_clean": True,
+        "modified_files": [],
+    }
     try:
         res = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -87,10 +94,47 @@ def get_git_commit(project_root: Path) -> str:
             check=False,
         )
         if res.returncode == 0 and res.stdout.strip():
-            return res.stdout.strip()
+            info["git_commit"] = res.stdout.strip()
+
+        res_url = subprocess.run(
+            ["git", "config", "--get", "remote.origin.url"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res_url.returncode == 0 and res_url.stdout.strip():
+            info["git_repo_url"] = res_url.stdout.strip()
+
+        res_branch = subprocess.run(
+            ["git", "branch", "--show-current"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res_branch.returncode == 0 and res_branch.stdout.strip():
+            info["git_branch"] = res_branch.stdout.strip()
+
+        res_status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res_status.returncode == 0:
+            lines = [l.strip() for l in res_status.stdout.splitlines() if l.strip()]
+            info["working_tree_clean"] = (len(lines) == 0)
+            info["modified_files"] = lines
     except Exception:
         pass
-    return "none (clean standalone export)"
+    return info
+
+
+def get_git_commit(project_root: Path) -> str:
+    """Return current git commit hash if git repository is present, else 'none'."""
+    return get_git_info(project_root).get("git_commit", "none (standalone export)")
 
 
 # ================================================================== #
@@ -218,11 +262,28 @@ def create_manifest(
         except Exception:
             pass
 
+    # Load validation macro F0.5 if available
+    val_f05 = None
+    th_file = cfg.paths.models_dir / "selected_threshold.json"
+    if th_file.exists():
+        try:
+            with open(th_file, "r", encoding="utf-8") as f:
+                th_data = json.load(f)
+                val_f05 = th_data.get("validation_f0_5") or th_data.get("validation_f05")
+        except Exception:
+            pass
+
+    git_info = get_git_info(cfg.project_root)
+
     manifest = {
         "manifest_version": "1.0.0",
         "timestamp_utc": now,
         "execution_mode": cfg.execution.mode,
-        "git_commit": get_git_commit(cfg.project_root),
+        "git_commit": git_info["git_commit"],
+        "git_repo_url": git_info["git_repo_url"],
+        "git_branch": git_info["git_branch"],
+        "working_tree_clean": git_info["working_tree_clean"],
+        "modified_files": git_info["modified_files"],
         "source_code_sha256": compute_code_hash(cfg.project_root),
         "config_file_sha256": compute_file_sha256(cfg.project_root / "config.yaml"),
         "environment": {
@@ -243,6 +304,7 @@ def create_manifest(
             "max_train_s1_entities": cfg.training.max_train_s1_entities,
             "max_validation_s1_entities": cfg.training.max_validation_s1_entities,
             "candidate_recall": cand_recall,
+            "validation_macro_f05": val_f05,
             **(extra_metrics or {}),
         },
     }
@@ -582,14 +644,6 @@ def run_smoke_test(cfg: Config) -> bool:
     logger.info("Smoke test dataset: %d S1, %d S2, %d S3, %d GT links",
                 len(sample_data.source1), len(sample_data.source2), len(sample_data.source3), len(matched_ids))
 
-    # 2. Candidate generation
-    candidates = generate_candidates(sample_data.source1, sample_data.source2, sample_data.source3, cfg, ground_truth_map=gt_map)
-    logger.info("Generated %d smoke candidate pairs", len(candidates))
-
-    # 3. Features
-    feat_df = build_feature_matrix(candidates, sample_data, cfg, fit_tfidf=True)
-    logger.info("Built feature matrix: %d rows x %d cols", len(feat_df), len(feat_df.columns))
-
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_p = Path(tmp_dir)
         tmp_models_dir = tmp_p / "models"
@@ -608,8 +662,30 @@ def run_smoke_test(cfg: Config) -> bool:
         )
         tmp_cfg = replace(cfg, paths=tmp_paths)
 
-        # 4. Training
-        train_df, val_df, val_gt = build_training_dataset(feat_df, gt_map, tmp_cfg)
+        # 2. Split S1 entities at entity level before TF-IDF fitting
+        from .dataset_builder import split_s1_entities
+        train_s1_ids, val_s1_ids, val_gt = split_s1_entities(sample_data.source1, gt_map, tmp_cfg)
+
+        # 3. Fit TF-IDF bundle strictly on training entities and pool
+        from .feature_builder import fit_tfidf_bundle, save_tfidf_bundle
+        s1_train = sample_data.source1[sample_data.source1["entity_id"].isin(train_s1_ids)]
+        smoke_pool = pd.concat([sample_data.source2, sample_data.source3], ignore_index=True)
+        smoke_bundle = fit_tfidf_bundle(s1_train, smoke_pool, tmp_cfg)
+        save_tfidf_bundle(smoke_bundle, tmp_models_dir / "tfidf_bundle.joblib")
+
+        # 4. Candidate generation with validation recall evaluation
+        candidates = generate_candidates(
+            sample_data.source1, sample_data.source2, sample_data.source3, tmp_cfg,
+            ground_truth_map=val_gt,
+        )
+        logger.info("Generated %d smoke candidate pairs", len(candidates))
+
+        # 5. Features built using fitted bundle via transform()
+        feat_df = build_feature_matrix(candidates, sample_data, tmp_cfg, fit_tfidf=False, tfidf_bundle=smoke_bundle, pool=smoke_pool)
+        logger.info("Built feature matrix: %d rows x %d cols", len(feat_df), len(feat_df.columns))
+
+        # 6. Training dataset & model
+        train_df, val_df, _ = build_training_dataset(feat_df, gt_map, tmp_cfg)
         train_model(train_df, val_df, tmp_cfg, val_gt_map=val_gt)
 
         # 5. Evaluation
@@ -673,24 +749,50 @@ def generate_final_submission_report(
                 else:
                     pred_singletons += 1
 
+    # Dynamically format candidate recall without hardcoded fallbacks
+    cand_recall = pm.get("candidate_recall")
+    if cand_recall is not None and isinstance(cand_recall, (int, float)):
+        recall_display = f"**{cand_recall:.4f}** ({cand_recall * 100:.2f}% true links covered)"
+    else:
+        recall_display = "**NOT_AVAILABLE** (evaluation population contained 0 known true links)"
+
+    # Dynamically format threshold without hardcoded fallbacks
+    def _short_hash(val):
+        if not val or val == "none":
+            return "N/A"
+        return str(val)[:16]
+
+    thresh = mod.get("selected_threshold")
+    thresh_display = f"**{thresh:.2f}**" if (thresh is not None and isinstance(thresh, (int, float))) else "**NOT_TUNED**"
+
+    # Dynamically format validation macro F0.5 without hardcoded fallbacks
+    val_f05 = pm.get("validation_macro_f05")
+    val_f05_display = f"**{val_f05:.4f}**" if (val_f05 is not None and isinstance(val_f05, (int, float))) else "**NOT_MEASURED**"
+
+    git_url = manifest.get("git_repo_url", "none")
+    git_branch = manifest.get("git_branch", "none")
+    tree_clean = manifest.get("working_tree_clean", True)
+    mod_files = manifest.get("modified_files", [])
+    tree_status_str = "CLEAN" if tree_clean else f"DIRTY ({len(mod_files)} uncommitted file changes)"
+
     md = f"""# Final Submission Report
 
 ## 1. Dataset
 The complete official challenge dataset was processed:
-- **Train Source 1 (Reference)**: {ds.get('train_source1', {}).get('file_size_mb')} MB ({ds.get('train_source1', {}).get('sha256')[:16]}...)
-- **Train Source 2 (Noisy)**: {ds.get('train_source2', {}).get('file_size_mb')} MB ({ds.get('train_source2', {}).get('sha256')[:16]}...)
-- **Train Source 3 (Noisy)**: {ds.get('train_source3', {}).get('file_size_mb')} MB ({ds.get('train_source3', {}).get('sha256')[:16]}...)
-- **Train Ground Truth**: {ds.get('train_ground_truth', {}).get('file_size_mb')} MB ({ds.get('train_ground_truth', {}).get('sha256')[:16]}...)
-- **Test Source 1**: {ds.get('test_source1', {}).get('file_size_mb')} MB ({ds.get('test_source1', {}).get('sha256')[:16]}...)
-- **Test Source 2**: {ds.get('test_source2', {}).get('file_size_mb')} MB ({ds.get('test_source2', {}).get('sha256')[:16]}...)
-- **Test Source 3**: {ds.get('test_source3', {}).get('file_size_mb')} MB ({ds.get('test_source3', {}).get('sha256')[:16]}...)
+- **Train Source 1 (Reference)**: {ds.get('train_source1', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('train_source1', {}).get('sha256'))}...)
+- **Train Source 2 (Noisy)**: {ds.get('train_source2', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('train_source2', {}).get('sha256'))}...)
+- **Train Source 3 (Noisy)**: {ds.get('train_source3', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('train_source3', {}).get('sha256'))}...)
+- **Train Ground Truth**: {ds.get('train_ground_truth', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('train_ground_truth', {}).get('sha256'))}...)
+- **Test Source 1**: {ds.get('test_source1', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('test_source1', {}).get('sha256'))}...)
+- **Test Source 2**: {ds.get('test_source2', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('test_source2', {}).get('sha256'))}...)
+- **Test Source 3**: {ds.get('test_source3', {}).get('file_size_mb', 'N/A')} MB ({_short_hash(ds.get('test_source3', {}).get('sha256'))}...)
 
 ## 2. Training
 - **Execution Mode**: `{manifest.get('execution_mode')}`
 - **Training S1 Entities Limit**: `{pm.get('max_train_s1_entities', 'FULL (unrestricted)')}`
 - **Validation S1 Entities Limit**: `{pm.get('max_validation_s1_entities', 'FULL (unrestricted)')}`
 - **Model Type**: `{mod.get('model_type', 'lightgbm')}`
-- **Saved Model File**: `{mod.get('model_file')}` (SHA-256: `{mod.get('model_sha256')[:16]}...`)
+- **Saved Model File**: `{mod.get('model_file')}` (SHA-256: `{_short_hash(mod.get('model_sha256'))}...`)
 - **Negative Sampling**: Configured max negatives per positive = {cfg.training.max_negatives_per_positive}, prioritizing hard negatives.
 
 ## 3. Blocking
@@ -700,13 +802,13 @@ The complete official challenge dataset was processed:
   - `country + postal_code`
   - `name_token + postal_code`
   - `name_prefix + postal_code`
-- **Candidate Recall (Link-Level)**: **{pm.get('candidate_recall', '0.9766')}** (≥ 97.6% true links covered)
+- **Candidate Recall (Link-Level)**: {recall_display}
 - **Candidate Safety Cap**: max {cfg.blocking.max_candidates_per_s1} candidates per S1 entity with similarity pre-ranking.
 
 ## 4. Validation
 - **Evaluation Metric**: Exact Challenge Macro-averaged Entity-Level $F_{{0.5}}$ with exact singleton handling ($F_{{0.5}} = 1.0$ for true singletons predicted empty, $0.0$ for false positives).
-- **Tuned Threshold**: **{mod.get('selected_threshold', 0.90)}**
-- **Validation Macro F0.5**: **{pm.get('validation_macro_f05', 0.9705)}**
+- **Tuned Threshold**: {thresh_display}
+- **Validation Macro F0.5**: {val_f05_display}
 
 ## 5. Test Prediction
 - **Test Source 1 Entities**: **{test_s1_count:,}**
@@ -728,9 +830,12 @@ The complete official challenge dataset was processed:
 - **Timestamp (UTC)**: `{manifest.get('timestamp_utc')}`
 - **Source Code SHA-256**: `{manifest.get('source_code_sha256')}`
 - **Config YAML SHA-256**: `{manifest.get('config_file_sha256')}`
+- **Git Repository**: `{git_url}`
+- **Git Branch**: `{git_branch}`
 - **Git Commit**: `{manifest.get('git_commit')}`
-- **Python**: `{env.get('python_version', '').split()[0]}`
-- **Platform**: `{env.get('platform')}`
+- **Working Tree State**: `{tree_status_str}`
+- **Python**: `{env.get('python_version', 'N/A').split()[0] if env.get('python_version') else 'N/A'}`
+- **Platform**: `{env.get('platform', 'N/A')}`
 - **Key Packages**:
   - `pandas`: {env.get('package_versions', {}).get('pandas')}
   - `numpy`: {env.get('package_versions', {}).get('numpy')}
