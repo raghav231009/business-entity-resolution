@@ -1,0 +1,14 @@
+{
+  "candidate_recall": 1.0,
+  "total_true_links": 0,
+  "true_links_covered": 0,
+  "true_links_missed": 0,
+  "s1_entities_with_truth": 0,
+  "entities_all_covered_count": 0,
+  "entities_all_covered_pct": 100.0,
+  "entities_any_covered_count": 0,
+  "entities_any_covered_pct": 100.0,
+  "candidates_before_cap": 4393,
+  "candidates_after_cap": 1930,
+  "true_matches_lost_to_cap": 0
+}

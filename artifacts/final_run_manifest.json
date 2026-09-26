@@ -1,0 +1,84 @@
+{
+  "manifest_version": "1.0.0",
+  "timestamp_utc": "2026-09-26T12:42:41.236427+00:00",
+  "execution_mode": "final",
+  "git_commit": "none (clean standalone export)",
+  "source_code_sha256": "f1621eaf12d9b2d22d7828d643ea61e139fe4b7cc636f4782ca5cb0587faa927",
+  "config_file_sha256": "0a8407f650a696d73277fd87b347871945fa12d79a87c690c2acdf4d032537a0",
+  "environment": {
+    "python_version": "3.13.4 (tags/v3.13.4:8a526ec, Jun  3 2025, 17:46:04) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "package_versions": {
+      "python": "3.13.4",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "pandas": "2.3.0",
+      "numpy": "2.3.0",
+      "scikit-learn": "1.9.1",
+      "rapidfuzz": "3.14.6",
+      "lightgbm": "4.7.0",
+      "joblib": "1.6.0",
+      "pyyaml": "6.0.2",
+      "pytest": "9.1.1"
+    }
+  },
+  "dataset_files": {
+    "train_source1": {
+      "file_name": "train_source1.tsv",
+      "file_size_bytes": 210069713,
+      "file_size_mb": 200.34,
+      "sha256": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973"
+    },
+    "train_source2": {
+      "file_name": "train_source2.tsv",
+      "file_size_bytes": 489301488,
+      "file_size_mb": 466.63,
+      "sha256": "6336c1a055eec79cf8a6d99fdc8d32a2e4d9dc2662e00963cb35d66b89ed09ed"
+    },
+    "train_source3": {
+      "file_name": "train_source3.tsv",
+      "file_size_bytes": 503705637,
+      "file_size_mb": 480.37,
+      "sha256": "67da22f5151898ff3006febd836c1a159e97ae95efa7257a5aff4fda685e58e9"
+    },
+    "train_ground_truth": {
+      "file_name": "train_ground_truth.tsv",
+      "file_size_bytes": 127015583,
+      "file_size_mb": 121.13,
+      "sha256": "70bc1d8a16c667e0155c2105d0ab2ebe41d7e7a85d8a529e3ca81c6c3a5af037"
+    },
+    "test_source1": {
+      "file_name": "test_source1.tsv",
+      "file_size_bytes": 175022086,
+      "file_size_mb": 166.91,
+      "sha256": "3d4a32c54c2ca9c53fd7c2be105bf26f708f94c4d2f88eb370972a195665c2f5"
+    },
+    "test_source2": {
+      "file_name": "test_source2.tsv",
+      "file_size_bytes": 509456422,
+      "file_size_mb": 485.86,
+      "sha256": "79d906c7497af2ace70aa277f6e334a652094909de99bd6c57b53420b6a7b2dd"
+    },
+    "test_source3": {
+      "file_name": "test_source3.tsv",
+      "file_size_bytes": 506002772,
+      "file_size_mb": 482.56,
+      "sha256": "850942b11d2a4343486ed0834e28bce9f3b385f3fd497fd60ccf4ea3b8bda035"
+    }
+  },
+  "model": {
+    "model_type": "lightgbm",
+    "model_file": "entity_matcher.joblib",
+    "model_sha256": "ab38ed238f3a83f650ff0f3198e52ff0c49e42d6fd401914e2c1e74c5c0059eb",
+    "meta_sha256": "6bd6d247196e89614247058cafb40dac6e1684c5673343d87ac120d041b5fd33",
+    "selected_threshold": 0.9
+  },
+  "output_files": {
+    "matching_results_tsv": "8b83d55cebec1f0ba1c37e999e7d9d03d5eb9c23bd4f2ac90aa0f4455e995a75",
+    "candidate_pairs_tsv": "dd61c601b630c3769fc2d30da17cb7aeea8d8c96dcf0d2342b31870cfd480156"
+  },
+  "pipeline_metrics": {
+    "max_train_s1_entities": null,
+    "max_validation_s1_entities": null,
+    "candidate_recall": 1.0
+  }
+}

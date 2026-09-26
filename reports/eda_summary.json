@@ -1,0 +1,790 @@
+{
+  "dataset_sizes": {
+    "train_source1": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\train\\train_source1.tsv",
+      "file_name": "train_source1.tsv",
+      "file_size_bytes": 210069713,
+      "file_size_mb": 200.34,
+      "row_count": 2206821,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    },
+    "train_source2": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\train\\train_source2.tsv",
+      "file_name": "train_source2.tsv",
+      "file_size_bytes": 489301488,
+      "file_size_mb": 466.63,
+      "row_count": 5034616,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    },
+    "train_source3": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\train\\train_source3.tsv",
+      "file_name": "train_source3.tsv",
+      "file_size_bytes": 503705637,
+      "file_size_mb": 480.37,
+      "row_count": 5285603,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    },
+    "train_ground_truth": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\train\\train_ground_truth.tsv",
+      "file_name": "train_ground_truth.tsv",
+      "file_size_bytes": 127015583,
+      "file_size_mb": 121.13,
+      "row_count": 2206821,
+      "column_count": 2,
+      "columns": [
+        "source1_entity_id",
+        "matched_entity_ids"
+      ]
+    },
+    "test_source1": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\test\\test_source1.tsv",
+      "file_name": "test_source1.tsv",
+      "file_size_bytes": 175022086,
+      "file_size_mb": 166.91,
+      "row_count": 1732544,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    },
+    "test_source2": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\test\\test_source2.tsv",
+      "file_name": "test_source2.tsv",
+      "file_size_bytes": 509456422,
+      "file_size_mb": 485.86,
+      "row_count": 4887273,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    },
+    "test_source3": {
+      "file_path": "D:\\Amazon ML\\business_entity_resolution\\data\\test\\test_source3.tsv",
+      "file_name": "test_source3.tsv",
+      "file_size_bytes": 506002772,
+      "file_size_mb": 482.56,
+      "row_count": 5082316,
+      "column_count": 4,
+      "columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ]
+    }
+  },
+  "schemas": {
+    "train_source1": {
+      "file_name": "train_source1.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    },
+    "train_source2": {
+      "file_name": "train_source2.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    },
+    "train_source3": {
+      "file_name": "train_source3.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    },
+    "train_ground_truth": {
+      "file_name": "train_ground_truth.tsv",
+      "column_names": [
+        "source1_entity_id",
+        "matched_entity_ids"
+      ],
+      "expected_columns": [
+        "source1_entity_id",
+        "matched_entity_ids"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "source1_entity_id": "string (utf-8)",
+        "matched_entity_ids": "string (utf-8)"
+      }
+    },
+    "test_source1": {
+      "file_name": "test_source1.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    },
+    "test_source2": {
+      "file_name": "test_source2.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    },
+    "test_source3": {
+      "file_name": "test_source3.tsv",
+      "column_names": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "expected_columns": [
+        "entity_id",
+        "business_name",
+        "business_address",
+        "country"
+      ],
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "is_schema_valid": true,
+      "dtypes": {
+        "entity_id": "string (utf-8)",
+        "business_name": "string (utf-8)",
+        "business_address": "string (utf-8)",
+        "country": "string (utf-8)"
+      }
+    }
+  },
+  "missing_values": {
+    "train_source1": {
+      "total_rows": 2206821,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 2206821,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 2206821,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 2206821,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 2206821,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    },
+    "train_source2": {
+      "total_rows": 5034616,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5034616,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 1,
+          "total_missing": 1,
+          "total_rows": 5034616,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 168967,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 168967,
+          "total_rows": 5034616,
+          "missing_percentage": 3.3561,
+          "empty_percentage": 3.3561
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5034616,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    },
+    "train_source3": {
+      "total_rows": 5285603,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5285603,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5285603,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 175916,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 175916,
+          "total_rows": 5285603,
+          "missing_percentage": 3.3282,
+          "empty_percentage": 3.3282
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5285603,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    },
+    "test_source1": {
+      "total_rows": 1732544,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 1732544,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 1732544,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 1732544,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 1732544,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    },
+    "test_source2": {
+      "total_rows": 4887273,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 4887273,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 4887273,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 129408,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 129408,
+          "total_rows": 4887273,
+          "missing_percentage": 2.6479,
+          "empty_percentage": 2.6479
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 4887273,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    },
+    "test_source3": {
+      "total_rows": 5082316,
+      "columns": {
+        "entity_id": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5082316,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_name": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 1,
+          "total_missing": 1,
+          "total_rows": 5082316,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        },
+        "business_address": {
+          "empty_string": 136098,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 136098,
+          "total_rows": 5082316,
+          "missing_percentage": 2.6779,
+          "empty_percentage": 2.6779
+        },
+        "country": {
+          "empty_string": 0,
+          "whitespace_only": 0,
+          "null_like": 0,
+          "total_missing": 0,
+          "total_rows": 5082316,
+          "missing_percentage": 0.0,
+          "empty_percentage": 0.0
+        }
+      }
+    }
+  },
+  "countries": {
+    "per_dataset": {
+      "train_source1": {
+        "total_rows": 2206821,
+        "unique_countries": [
+          "india",
+          "us"
+        ],
+        "counts": {
+          "us": 1323633,
+          "india": 883188
+        },
+        "percentages": {
+          "us": 59.9792,
+          "india": 40.0208
+        }
+      },
+      "train_source2": {
+        "total_rows": 5034616,
+        "unique_countries": [
+          "india",
+          "us"
+        ],
+        "counts": {
+          "us": 3016817,
+          "india": 2017799
+        },
+        "percentages": {
+          "us": 59.9215,
+          "india": 40.0785
+        }
+      },
+      "train_source3": {
+        "total_rows": 5285603,
+        "unique_countries": [
+          "india",
+          "us"
+        ],
+        "counts": {
+          "us": 3170056,
+          "india": 2115547
+        },
+        "percentages": {
+          "us": 59.9753,
+          "india": 40.0247
+        }
+      },
+      "test_source1": {
+        "total_rows": 1732544,
+        "unique_countries": [
+          "france",
+          "india",
+          "us"
+        ],
+        "counts": {
+          "india": 809986,
+          "us": 663106,
+          "france": 259452
+        },
+        "percentages": {
+          "india": 46.7513,
+          "us": 38.2735,
+          "france": 14.9752
+        }
+      },
+      "test_source2": {
+        "total_rows": 4887273,
+        "unique_countries": [
+          "france",
+          "india",
+          "us"
+        ],
+        "counts": {
+          "india": 2312565,
+          "us": 1871330,
+          "france": 703378
+        },
+        "percentages": {
+          "india": 47.3181,
+          "us": 38.2899,
+          "france": 14.392
+        }
+      },
+      "test_source3": {
+        "total_rows": 5082316,
+        "unique_countries": [
+          "france",
+          "india",
+          "us"
+        ],
+        "counts": {
+          "india": 2405000,
+          "us": 1945701,
+          "france": 731615
+        },
+        "percentages": {
+          "india": 47.3209,
+          "us": 38.2837,
+          "france": 14.3953
+        }
+      }
+    },
+    "all_unique_countries": [
+      "france",
+      "india",
+      "us"
+    ],
+    "france_in_test": true,
+    "france_detected_datasets": [
+      "test_source1",
+      "test_source2",
+      "test_source3"
+    ]
+  },
+  "name_statistics": {
+    "sample_analyzed": 100000,
+    "unique_raw_names": 90403,
+    "unique_normalized_names": 83880,
+    "duplicate_raw_pct": 9.6,
+    "duplicate_normalized_pct": 16.12,
+    "empty_names_count": 0,
+    "name_length_distribution": {
+      "mean": 24.04,
+      "std": 7.73,
+      "min": 3.0,
+      "p25": 18.0,
+      "median": 24.0,
+      "p75": 30.0,
+      "p90": 34.0,
+      "max": 71.0
+    },
+    "name_token_count_distribution": {
+      "mean": 3.55,
+      "std": 0.98,
+      "min": 1.0,
+      "p25": 3.0,
+      "median": 4.0,
+      "p75": 4.0,
+      "p90": 5.0,
+      "max": 12.0
+    },
+    "punctuation_frequency_pct": 20.68,
+    "legal_suffix_frequencies": {
+      "ltd": 6587,
+      "limited": 23920,
+      "pvt": 5312,
+      "private": 19823,
+      "inc": 10873,
+      "llc": 16032,
+      "corp": 1577,
+      "corporation": 630,
+      "co": 1241,
+      "company": 612,
+      "plc": 0
+    }
+  },
+  "address_statistics": {
+    "sample_analyzed": 100000,
+    "empty_addresses_count": 0,
+    "empty_addresses_pct": 0.0,
+    "address_length_distribution": {
+      "mean": 52.08,
+      "std": 25.35,
+      "min": 13.0,
+      "p25": 33.0,
+      "median": 41.0,
+      "p75": 70.0,
+      "p90": 90.0,
+      "max": 222.0
+    },
+    "address_token_count_distribution": {
+      "mean": 8.04,
+      "std": 3.52,
+      "min": 3.0,
+      "p25": 5.0,
+      "median": 7.0,
+      "p75": 10.0,
+      "p90": 13.0,
+      "max": 38.0
+    },
+    "numeric_token_distribution": {
+      "mean": 1.35,
+      "std": 0.87,
+      "min": 0.0,
+      "p25": 1.0,
+      "median": 1.0,
+      "p75": 2.0,
+      "p90": 2.0,
+      "max": 22.0
+    },
+    "has_numeric_tokens_pct": 94.27,
+    "has_postal_code_pct": 6.76,
+    "common_abbreviation_frequencies": {
+      "st": 742,
+      "rd": 876,
+      "ave": 133,
+      "blvd": 11,
+      "dr": 344,
+      "ln": 51,
+      "hwy": 83,
+      "apt": 924,
+      "ste": 126,
+      "fl": 1518
+    },
+    "unique_raw_addresses": 99713,
+    "unique_normalized_addresses": 99711
+  },
+  "ground_truth": {
+    "total_source1_entities": 2206821,
+    "total_true_links": 7638365,
+    "source2_true_links": 3693619,
+    "source3_true_links": 3944746,
+    "s2_only_source1_entities": 143029,
+    "s3_only_source1_entities": 164498,
+    "s2_plus_s3_source1_entities": 1776047,
+    "singleton_count": 123247,
+    "singleton_percentage": 5.5848,
+    "exactly_one_match_count": 119157,
+    "exactly_one_match_percentage": 5.3995,
+    "multiple_matches_count": 1964417,
+    "multiple_matches_percentage": 89.0157,
+    "matches_per_s1_stats": {
+      "mean": 3.4613,
+      "median": 3.0,
+      "min": 0,
+      "max": 11,
+      "std": 1.7053,
+      "p25": 2.0,
+      "p75": 5.0,
+      "p90": 6.0
+    }
+  },
+  "true_pair_similarity": {
+    "pairs_evaluated": 25000,
+    "exact_normalized_name_match_pct": 35.13,
+    "fuzzy_name_similarity": {
+      "mean": 79.56,
+      "std": 26.22,
+      "min": 3.33,
+      "p25": 71.88,
+      "median": 88.0,
+      "p75": 100.0,
+      "p90": 100.0,
+      "max": 100.0
+    },
+    "token_sort_name_similarity": {
+      "mean": 79.32,
+      "std": 26.83,
+      "min": 3.33,
+      "p25": 70.59,
+      "median": 88.89,
+      "p75": 100.0,
+      "p90": 100.0,
+      "max": 100.0
+    },
+    "exact_normalized_address_match_pct": 11.08,
+    "fuzzy_address_similarity": {
+      "mean": 76.4,
+      "std": 23.66,
+      "min": 0.0,
+      "p25": 65.93,
+      "median": 84.11,
+      "p75": 92.69,
+      "p90": 100.0,
+      "max": 100.0
+    },
+    "address_token_jaccard": {
+      "mean": 0.64,
+      "std": 0.26,
+      "min": 0.0,
+      "p25": 0.5,
+      "median": 0.67,
+      "p75": 0.83,
+      "p90": 1.0,
+      "max": 1.0
+    },
+    "country_equality_pct": 100.0
+  }
+}

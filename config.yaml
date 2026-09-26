@@ -1,0 +1,260 @@
+# ============================================================
+# Business Entity Resolution — Central Configuration
+# ============================================================
+# Modify settings here instead of editing source code.
+# All paths are relative to the project root unless absolute.
+
+# ----------------------------------------------------------
+# General
+# ----------------------------------------------------------
+general:
+  random_seed: 42
+  project_root: "."          # resolved at runtime
+  log_level: "INFO"          # DEBUG | INFO | WARNING | ERROR
+
+# ----------------------------------------------------------
+# Execution Mode
+# ----------------------------------------------------------
+execution:
+  mode: "dev"                # "dev" (fast development/testing) | "final" (full competition run)
+
+development:
+  max_train_s1_entities: 50000
+  max_validation_s1_entities: 10000
+
+final:
+  max_train_s1_entities: ~   # null = use all available entities (no hidden caps)
+  max_validation_s1_entities: ~ # null = use full validation split (no cap)
+
+# ----------------------------------------------------------
+# Data Paths
+# ----------------------------------------------------------
+paths:
+  train:
+    source1: "data/train/train_source1.tsv"
+    source2: "data/train/train_source2.tsv"
+    source3: "data/train/train_source3.tsv"
+    ground_truth: "data/train/train_ground_truth.tsv"
+  test:
+    source1: "data/test/test_source1.tsv"
+    source2: "data/test/test_source2.tsv"
+    source3: "data/test/test_source3.tsv"
+  models_dir: "models"
+  artifacts_dir: "artifacts"
+  output_dir: "output"
+  candidate_cache_dir: "artifacts/candidate_cache"
+  feature_cache_dir: "artifacts/feature_cache"
+  metrics_dir: "artifacts/metrics"
+  reports_dir: "reports"
+
+# ----------------------------------------------------------
+# Preprocessing
+# ----------------------------------------------------------
+preprocessing:
+  # Legal suffixes to strip (order matters — longer first)
+  legal_suffixes:
+    - "private limited"
+    - "pvt ltd"
+    - "pvt. ltd."
+    - "pvt. ltd"
+    - "pvt ltd."
+    - "limited liability company"
+    - "incorporated"
+    - "corporation"
+    - "limited"
+    - "llc"
+    - "llp"
+    - "inc."
+    - "inc"
+    - "corp."
+    - "corp"
+    - "ltd."
+    - "ltd"
+    - "co."
+    - "co"
+    - "plc"
+    - "gmbh"
+    - "sarl"
+    - "sa"
+    - "sas"
+    - "ag"
+
+  # Address abbreviations (lowercase → expansion)
+  address_abbreviations:
+    "st": "street"
+    "st.": "street"
+    "rd": "road"
+    "rd.": "road"
+    "ave": "avenue"
+    "ave.": "avenue"
+    "blvd": "boulevard"
+    "blvd.": "boulevard"
+    "dr": "drive"
+    "dr.": "drive"
+    "ln": "lane"
+    "ln.": "lane"
+    "ct": "court"
+    "ct.": "court"
+    "fl": "floor"
+    "fl.": "floor"
+    "ste": "suite"
+    "ste.": "suite"
+    "apt": "apartment"
+    "apt.": "apartment"
+    "bldg": "building"
+    "bldg.": "building"
+    "hwy": "highway"
+    "hwy.": "highway"
+    "pkwy": "parkway"
+    "pkwy.": "parkway"
+    "sq": "square"
+    "sq.": "square"
+    "nr": "near"
+    "nr.": "near"
+    "opp": "opposite"
+    "opp.": "opposite"
+    "dist": "district"
+    "dist.": "district"
+
+# ----------------------------------------------------------
+# Blocking / Candidate Generation
+# ----------------------------------------------------------
+blocking:
+  strategies:
+    # Single-channel blocks (country alone disabled to avoid candidate explosion)
+    country_block: false
+    name_token_block: true
+    name_prefix_block: true
+    name_prefix_length: 4
+    address_token_block: false       # Disabled: 1M keys, generates massive noise pairs with 0 name similarity
+    postal_code_block: true
+    char_ngram_block: false          # Disabled: generates excessive candidate combinations on 10M rows
+    char_ngram_n: 3
+    char_ngram_min_shared: 2
+
+    # Informative compound multi-channel blocks
+    country_name_token_block: true
+    country_name_prefix_block: true
+    country_postal_block: true
+    country_address_token_block: false # Disabled: noisy, causes candidate explosion
+    name_token_postal_block: true
+    name_prefix_postal_block: true
+    name_token_address_token_block: false # Disabled: redundant subset of name_token_block, 21M keys
+
+  # Maximum candidates per Source-1 entity (safety cap)
+  max_candidates_per_s1: 50
+  # When candidates exceed cap, use similarity-based pre-ranking (never arbitrary ID ordering)
+  similarity_prerank: true
+  # Maximum size of any single block key (prunes uninformative generic tokens)
+  max_block_size: 500
+
+# ----------------------------------------------------------
+# Feature Engineering
+# ----------------------------------------------------------
+features:
+  # Name features
+  name_exact: true
+  name_fuzzy_ratio: true
+  name_partial_ratio: true
+  name_token_sort_ratio: true
+  name_token_set_ratio: true
+  name_jaccard: true
+  name_char_sim: true
+  name_tfidf_cosine: true
+  name_length_diff: true
+  name_token_count_diff: true
+  name_common_tokens: true
+
+  # Address features
+  address_exact: true
+  address_fuzzy: true
+  address_token_sim: true
+  address_jaccard: true
+  address_char_sim: true
+  address_tfidf_cosine: true
+  address_length_diff: true
+  address_common_tokens: true
+  address_numeric_overlap: true
+  postal_code_match: true
+  house_number_match: true
+
+  # Country feature
+  country_exact: true
+
+  # Source indicator
+  source_indicator: true
+
+  # TF-IDF settings
+  tfidf:
+    name_word_ngram_range: [1, 2]
+    name_char_ngram_range: [2, 4]
+    address_word_ngram_range: [1, 2]
+    address_char_ngram_range: [2, 4]
+    max_features: 10000
+
+# ----------------------------------------------------------
+# Model
+# ----------------------------------------------------------
+model:
+  type: "lightgbm"            # lightgbm | catboost
+  lightgbm:
+    objective: "binary"
+    metric: "binary_logloss"
+    boosting_type: "gbdt"
+    n_estimators: 500
+    learning_rate: 0.05
+    num_leaves: 63
+    max_depth: -1
+    min_child_samples: 20
+    subsample: 0.8
+    colsample_bytree: 0.8
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+    class_weight: "balanced"
+    verbose: -1
+    n_jobs: -1
+
+  catboost:
+    iterations: 500
+    learning_rate: 0.05
+    depth: 8
+    l2_leaf_reg: 3.0
+    auto_class_weights: "Balanced"
+    verbose: 0
+
+  saved_model_name: "entity_matcher"   # filename stem
+
+# ----------------------------------------------------------
+# Training
+# ----------------------------------------------------------
+training:
+  validation_split: 0.2       # fraction of S1 entities for validation
+  negative_sampling_ratio: ~  # null = keep all negatives from blocking
+  max_negatives_per_positive: 20
+  shuffle: true
+  max_train_s1_entities: ~   # Set dynamically by execution mode (dev: 50000, final: null)
+  max_validation_s1_entities: ~ # Set dynamically by execution mode (dev: 10000, final: null)
+
+# ----------------------------------------------------------
+# Threshold Tuning
+# ----------------------------------------------------------
+threshold:
+  search_range: [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+  default: 0.50
+  selected: ~                  # filled after tuning
+
+# ----------------------------------------------------------
+# Post-processing / Singleton Protection
+# ----------------------------------------------------------
+postprocessing:
+  min_probability: 0.50
+  min_name_similarity: 0.0     # set > 0 to add safety guard
+  min_address_similarity: 0.0
+  require_country_match: false
+
+# ----------------------------------------------------------
+# Caching
+# ----------------------------------------------------------
+cache:
+  enabled: true
+  invalidate: false            # set true to force recompute

@@ -1,0 +1,24 @@
+{
+  "source_name": "source1",
+  "full_row_count": 2206821,
+  "column_count": 4,
+  "sample_analyzed": 50000,
+  "missing_values": {
+    "entity_id": 0,
+    "business_name": 0,
+    "business_address": 0,
+    "country": 0,
+    "business_name_normalized": 0,
+    "business_address_normalized": 0,
+    "country_normalized": 0,
+    "postal_code": 0,
+    "house_number": 0,
+    "address_numeric_tokens": 0
+  },
+  "top_countries": {
+    "us": 30150,
+    "india": 19850
+  },
+  "avg_name_length": 18.62668,
+  "avg_address_length": 48.9009
+}

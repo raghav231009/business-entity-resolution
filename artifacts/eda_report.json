@@ -1,0 +1,106 @@
+{
+  "dataset_shapes": {
+    "source1": [
+      2206821,
+      4
+    ],
+    "source2": [
+      5034616,
+      4
+    ],
+    "source3": [
+      5285603,
+      4
+    ],
+    "ground_truth": [
+      2206821,
+      2
+    ]
+  },
+  "sources": {
+    "source1": {
+      "source_name": "source1",
+      "full_row_count": 2206821,
+      "column_count": 4,
+      "sample_analyzed": 50000,
+      "missing_values": {
+        "entity_id": 0,
+        "business_name": 0,
+        "business_address": 0,
+        "country": 0,
+        "business_name_normalized": 0,
+        "business_address_normalized": 0,
+        "country_normalized": 0,
+        "postal_code": 0,
+        "house_number": 0,
+        "address_numeric_tokens": 0
+      },
+      "top_countries": {
+        "us": 30150,
+        "india": 19850
+      },
+      "avg_name_length": 18.62668,
+      "avg_address_length": 48.9009
+    },
+    "source2": {
+      "source_name": "source2",
+      "full_row_count": 5034616,
+      "column_count": 4,
+      "sample_analyzed": 50000,
+      "missing_values": {
+        "entity_id": 0,
+        "business_name": 0,
+        "business_address": 0,
+        "country": 0,
+        "business_name_normalized": 0,
+        "business_address_normalized": 0,
+        "country_normalized": 0,
+        "postal_code": 0,
+        "house_number": 0,
+        "address_numeric_tokens": 0
+      },
+      "top_countries": {
+        "us": 30024,
+        "india": 19976
+      },
+      "avg_name_length": 22.0068,
+      "avg_address_length": 44.0633
+    },
+    "source3": {
+      "source_name": "source3",
+      "full_row_count": 5285603,
+      "column_count": 4,
+      "sample_analyzed": 50000,
+      "missing_values": {
+        "entity_id": 0,
+        "business_name": 0,
+        "business_address": 0,
+        "country": 0,
+        "business_name_normalized": 0,
+        "business_address_normalized": 0,
+        "country_normalized": 0,
+        "postal_code": 0,
+        "house_number": 0,
+        "address_numeric_tokens": 0
+      },
+      "top_countries": {
+        "us": 30078,
+        "india": 19922
+      },
+      "avg_name_length": 22.06264,
+      "avg_address_length": 44.3816
+    }
+  },
+  "ground_truth": {
+    "total_s1_entities": 2206821,
+    "singletons": 123247,
+    "singleton_pct": 5.584820880352326,
+    "entities_with_matches": 2083574,
+    "entities_with_matches_pct": 94.41517911964768,
+    "total_match_links": 7638365,
+    "min_matches": 0,
+    "max_matches": 11,
+    "mean_matches": 3.4612526344456573,
+    "median_matches": 3.0
+  }
+}

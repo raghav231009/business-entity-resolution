@@ -1,0 +1,12 @@
+{
+  "macro_f05": 0.965536427816223,
+  "macro_precision": 0.9707229761904762,
+  "macro_recall": 0.9678475000000001,
+  "n_entities": 10000,
+  "singleton_accuracy": 0.8838028169014085,
+  "pair_precision": 0.9741656438131977,
+  "pair_recall": 0.9667353035004785,
+  "predicted_matches": 34218,
+  "predicted_singletons": 536,
+  "threshold": 0.7
+}

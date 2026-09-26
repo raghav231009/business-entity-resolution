@@ -1,0 +1,146 @@
+{
+  "best_threshold": 0.9,
+  "best_f05": 0.9704740612587982,
+  "results": [
+    {
+      "threshold": 0.3,
+      "macro_f05": 0.9512828345310261,
+      "macro_precision": 0.9526456746031746,
+      "macro_recall": 0.9739466666666667,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.823943661971831,
+      "predicted_matches": 35216,
+      "predicted_singletons": 490
+    },
+    {
+      "threshold": 0.35,
+      "macro_f05": 0.954553881367471,
+      "macro_precision": 0.9564360714285715,
+      "macro_recall": 0.9734333333333334,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8415492957746479,
+      "predicted_matches": 35049,
+      "predicted_singletons": 501
+    },
+    {
+      "threshold": 0.4,
+      "macro_f05": 0.9568797274846845,
+      "macro_precision": 0.9591986111111112,
+      "macro_recall": 0.9729583333333334,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8485915492957746,
+      "predicted_matches": 34914,
+      "predicted_singletons": 506
+    },
+    {
+      "threshold": 0.45,
+      "macro_f05": 0.958780847905396,
+      "macro_precision": 0.9615067460317461,
+      "macro_recall": 0.9723547619047619,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8591549295774648,
+      "predicted_matches": 34796,
+      "predicted_singletons": 514
+    },
+    {
+      "threshold": 0.5,
+      "macro_f05": 0.9604428054359856,
+      "macro_precision": 0.963625119047619,
+      "macro_recall": 0.9716630952380952,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8661971830985915,
+      "predicted_matches": 34686,
+      "predicted_singletons": 519
+    },
+    {
+      "threshold": 0.55,
+      "macro_f05": 0.9613578595813653,
+      "macro_precision": 0.9649755158730159,
+      "macro_recall": 0.9708056349206349,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8661971830985915,
+      "predicted_matches": 34584,
+      "predicted_singletons": 521
+    },
+    {
+      "threshold": 0.6,
+      "macro_f05": 0.962452635658818,
+      "macro_precision": 0.9665610317460318,
+      "macro_recall": 0.9698419047619047,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8697183098591549,
+      "predicted_matches": 34480,
+      "predicted_singletons": 524
+    },
+    {
+      "threshold": 0.65,
+      "macro_f05": 0.9640872430277287,
+      "macro_precision": 0.9687436111111111,
+      "macro_recall": 0.9689015476190476,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.875,
+      "predicted_matches": 34349,
+      "predicted_singletons": 528
+    },
+    {
+      "threshold": 0.7,
+      "macro_f05": 0.965536427816223,
+      "macro_precision": 0.9707229761904762,
+      "macro_recall": 0.9678475000000001,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8838028169014085,
+      "predicted_matches": 34218,
+      "predicted_singletons": 536
+    },
+    {
+      "threshold": 0.75,
+      "macro_f05": 0.9671219089548589,
+      "macro_precision": 0.9728319047619048,
+      "macro_recall": 0.9669238095238095,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.8943661971830986,
+      "predicted_matches": 34102,
+      "predicted_singletons": 542
+    },
+    {
+      "threshold": 0.8,
+      "macro_f05": 0.96831529051584,
+      "macro_precision": 0.9748013095238095,
+      "macro_recall": 0.9649485714285715,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.903169014084507,
+      "predicted_matches": 33954,
+      "predicted_singletons": 548
+    },
+    {
+      "threshold": 0.85,
+      "macro_f05": 0.9695462566283102,
+      "macro_precision": 0.9771775396825396,
+      "macro_recall": 0.9616959523809524,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.9190140845070423,
+      "predicted_matches": 33752,
+      "predicted_singletons": 562
+    },
+    {
+      "threshold": 0.9,
+      "macro_f05": 0.9704740612587982,
+      "macro_precision": 0.9794360714285715,
+      "macro_recall": 0.9578343253968254,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.9295774647887324,
+      "predicted_matches": 33517,
+      "predicted_singletons": 573
+    },
+    {
+      "threshold": 0.95,
+      "macro_f05": 0.9696825646907402,
+      "macro_precision": 0.9822824206349207,
+      "macro_recall": 0.9460913492063492,
+      "n_entities": 10000,
+      "singleton_accuracy": 0.9559859154929577,
+      "predicted_matches": 32965,
+      "predicted_singletons": 602
+    }
+  ]
+}

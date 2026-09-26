@@ -1,0 +1,77 @@
+# ==============================================================================
+# Amazon ML Challenge — Business Entity Resolution .gitignore
+# ==============================================================================
+
+# Datasets (Strictly ignored — files are 100MB-500MB+)
+data/*
+!data/train/
+!data/test/
+!data/**/.gitkeep
+data/train/*
+!data/train/.gitkeep
+data/test/*
+!data/test/.gitkeep
+*.tsv
+*.csv.gz
+*.tar.gz
+*.zip
+
+# Generated Output Predictions (Candidate pairs TSV is >550MB)
+output/*
+!output/.gitkeep
+
+# Large Caches & Backups
+artifacts/backups/
+artifacts/candidate_cache/
+artifacts/feature_cache/
+models/val_predictions.csv
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# IDE & OS Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
