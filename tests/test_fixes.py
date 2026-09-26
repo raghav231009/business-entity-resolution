@@ -34,7 +34,7 @@ from business_entity_resolution.validation import validate_outputs
 # ================================================================== #
 
 class TestGroundTruthFullEvaluation:
-    def test_missed_match_by_blocking_penalized(self):
+    def test_missed_match_by_blocking_penalized(self, tmp_path):
         """
         True match {B, C} where blocking only found B.
         Predicting B should give recall = 1/2 = 0.5, NOT 1.0.
@@ -51,6 +51,7 @@ class TestGroundTruthFullEvaluation:
         }])
 
         cfg = Config()
+        cfg.paths.metrics_dir = tmp_path / "metrics"
         metrics = evaluate_from_predictions(val_df, threshold=0.50, cfg=cfg, ground_truth_map=full_gt)
 
         # Macro recall must be 0.5, and F0.5 must be < 1.0
@@ -60,7 +61,7 @@ class TestGroundTruthFullEvaluation:
         # Specifically: (1 + 0.25) * 1.0 * 0.5 / (0.25 * 1.0 + 0.5) = 1.25 * 0.5 / 0.75 = 0.8333
         assert metrics["macro_f05"] == pytest.approx(0.8333, abs=1e-3)
 
-    def test_entity_with_zero_candidates_in_validation(self):
+    def test_entity_with_zero_candidates_in_validation(self, tmp_path):
         """
         An S1 entity in validation ground truth with a true match,
         but blocking generated 0 candidate pairs. Recall should be 0.0.
@@ -78,6 +79,7 @@ class TestGroundTruthFullEvaluation:
         }])
 
         cfg = Config()
+        cfg.paths.metrics_dir = tmp_path / "metrics"
         metrics = evaluate_from_predictions(val_df, threshold=0.50, cfg=cfg, ground_truth_map=full_gt)
 
         # S1-001 has F0.5 = 1.0, S1-002 has F0.5 = 0.0
@@ -146,7 +148,7 @@ class TestThresholdPersistence:
 # ================================================================== #
 
 class TestCandidateRankingNoAlphabeticalBias:
-    def test_high_similarity_candidate_preserved_over_alphabetical_order(self):
+    def test_high_similarity_candidate_preserved_over_alphabetical_order(self, tmp_path):
         """
         True match has ID 'S2-99999' (sorts last alphabetically).
         Noise records have IDs 'S2-00001' to 'S2-00300'.
@@ -154,6 +156,7 @@ class TestCandidateRankingNoAlphabeticalBias:
         Similarity pre-ranking MUST preserve 'S2-99999'.
         """
         cfg = Config()
+        cfg.paths.metrics_dir = tmp_path / "metrics"
         cfg.blocking.max_candidates_per_s1 = 5
         cfg.blocking.similarity_prerank = True
         # Enable token block
@@ -454,6 +457,8 @@ class TestPipelineEndToEnd:
         cfg.paths.artifacts_dir = tmp_path / "artifacts"
         cfg.paths.output_dir = tmp_path / "output"
         cfg.paths.metrics_dir = tmp_path / "artifacts" / "metrics"
+        cfg.paths.reports_dir = tmp_path / "reports"
+        cfg.project_root = tmp_path
         cfg.model.lightgbm["n_estimators"] = 10
         cfg.model.lightgbm["min_child_samples"] = 1
 
