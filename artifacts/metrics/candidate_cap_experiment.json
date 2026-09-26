@@ -17,7 +17,7 @@
       "entities_any_covered": 94,
       "entities_any_covered_pct": 94.0,
       "true_matches_lost_to_cap": 22,
-      "runtime_seconds": 0.258,
+      "runtime_seconds": 0.242,
       "peak_memory_mb": 0.69
     },
     {
@@ -35,7 +35,7 @@
       "entities_any_covered": 95,
       "entities_any_covered_pct": 95.0,
       "true_matches_lost_to_cap": 15,
-      "runtime_seconds": 0.269,
+      "runtime_seconds": 0.242,
       "peak_memory_mb": 0.94
     },
     {
@@ -53,7 +53,7 @@
       "entities_any_covered": 95,
       "entities_any_covered_pct": 95.0,
       "true_matches_lost_to_cap": 13,
-      "runtime_seconds": 0.287,
+      "runtime_seconds": 0.242,
       "peak_memory_mb": 1.33
     },
     {
@@ -71,7 +71,7 @@
       "entities_any_covered": 95,
       "entities_any_covered_pct": 95.0,
       "true_matches_lost_to_cap": 12,
-      "runtime_seconds": 0.283,
+      "runtime_seconds": 0.253,
       "peak_memory_mb": 1.79
     },
     {
@@ -89,7 +89,7 @@
       "entities_any_covered": 95,
       "entities_any_covered_pct": 95.0,
       "true_matches_lost_to_cap": 9,
-      "runtime_seconds": 0.283,
+      "runtime_seconds": 0.252,
       "peak_memory_mb": 2.45
     }
   ]
