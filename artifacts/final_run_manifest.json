@@ -1,14 +1,12 @@
 {
   "manifest_version": "1.0.0",
-  "timestamp_utc": "2026-09-26T13:20:19.431960+00:00",
+  "timestamp_utc": "2026-09-26T13:20:40.514424+00:00",
   "execution_mode": "dev",
-  "git_commit": "a339bae63ab1c65bf2e7467244cabef432d1e103",
+  "git_commit": "cfc97bc37234c5a773f85c51ac78e0ccc0c7ec8e",
   "git_repo_url": "https://github.com/raghav231009/business-entity-resolution.git",
   "git_branch": "main",
-  "working_tree_clean": false,
-  "modified_files": [
-    "M artifacts/final_run_manifest.json"
-  ],
+  "working_tree_clean": true,
+  "modified_files": [],
   "source_code_sha256": "c6e3e0d53b8ebae9b329df77dcc2e27432baac26d331114cd46bb099af592552",
   "config_file_sha256": "0a8407f650a696d73277fd87b347871945fa12d79a87c690c2acdf4d032537a0",
   "environment": {
