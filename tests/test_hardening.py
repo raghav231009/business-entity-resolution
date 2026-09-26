@@ -155,7 +155,7 @@ class TestCandidateRecallHardening:
         assert metrics["total_true_links"] == 0
         assert metrics["candidate_recall"] is None
         assert metrics["candidate_recall_status"] == "NOT_AVAILABLE"
-        assert "Candidate recall not measured" in metrics["message"]
+        assert "Candidate recall not measured" in str(metrics["message"])
 
     def test_positive_true_links_computes_exact_recall(self):
         """Candidate recall with real links returns exact ratio."""
@@ -198,6 +198,7 @@ class TestTfidfLeakFree:
         assert bundle.is_fitted is True
 
         # Calling compute_cosine does not alter vectorizer vocabulary (strictly transform)
+        assert bundle.name_word_vec is not None
         vocab_size_before = len(bundle.name_word_vec.vocabulary_)
         cand_s1 = ["S1-1"]
         cand_pool = ["S2-1"]
@@ -210,6 +211,7 @@ class TestTfidfLeakFree:
             vec_type="name_word",
         )
         assert len(sims) == 1
+        assert bundle.name_word_vec is not None
         assert len(bundle.name_word_vec.vocabulary_) == vocab_size_before
 
 

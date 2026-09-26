@@ -584,7 +584,7 @@ class TestChunkedStreamingInference:
         s1_records = [f"S1-{i:03d}" for i in range(10)]
         pd.DataFrame([{"entity_id": sid, "business_name": "Co", "business_address": "Ad", "country": "US"} for sid in s1_records]).to_csv(cfg.paths.test_source1, sep="\t", index=False)
         pd.DataFrame([{"entity_id": "S2-01", "business_name": "Co", "business_address": "Ad", "country": "US"}]).to_csv(cfg.paths.test_source2, sep="\t", index=False)
-        pd.DataFrame(columns=["entity_id", "business_name", "business_address", "country"]).to_csv(cfg.paths.test_source3, sep="\t", index=False)
+        pd.DataFrame({"entity_id": [], "business_name": [], "business_address": [], "country": []}).to_csv(cfg.paths.test_source3, sep="\t", index=False)
 
         # Chunk 1: first 5
         cands1 = {sid: {"S2-01"} for sid in s1_records[:5]}
